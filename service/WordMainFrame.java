@@ -6,18 +6,19 @@ import java.awt.GridLayout;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import dao_inf.DBdao;
 import dto.WordDTO;
 
 // JFrame으로부터 상속 받고, DBdao라는 인터페이스변수를 가지고 있다
-public class WordMainFrame extends JFrame implements ActionListener {
+public class WordMainFrame extends JFrame implements ActionListener, ItemListener {
 	private JPanel title_p = new JPanel(); // 컴포넌트&컨테이너.
 	// 기본 레이아웃이 flow 레이아웃.. 가운데부터하나씩 정렬
 	private JLabel t = new JLabel("단어장 프로그램");
@@ -49,6 +50,8 @@ public class WordMainFrame extends JFrame implements ActionListener {
 	JLabel c7 = new JLabel("한글");
 	JTextField j5 = new JTextField();
 	JTextField j6 = new JTextField();
+
+	ArrayList<WordDTO> w = null;
 
 	public WordMainFrame(DBdao d) {
 		this.dbdao = d; // DB 작업을 위한 객체 주소를 외부(Main class)로부터 주입 받는다.
@@ -87,6 +90,7 @@ public class WordMainFrame extends JFrame implements ActionListener {
 		center_2.add(c22, "Center");
 
 		// center_3 작업
+		j5.setEnabled(false); // j5(영어) 수정 불가 설정
 		c5c.setBackground(Color.gray);
 		c5c.setLayout(new GridLayout(2, 2));
 		c5c.add(c6);
@@ -97,9 +101,25 @@ public class WordMainFrame extends JFrame implements ActionListener {
 		center_3.add(c5, "North");
 		center_3.add(c5btn, "South");
 		center_3.add(c5c, "Center");
+
+		// 이벤트 감지를 위한 이벤트 등록
 		c1btn.addActionListener(this);
+		c22list.addItemListener(this);
+		c22btn.addActionListener(this);
+		c5btn.addActionListener(this);
+
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+		init();
+	}
+
+	// 리스트 목록 보기
+	private void init() {
+		w = dbdao.selectAll();
+		for (WordDTO t : w) {
+			c22list.add(t.getEng() + " : " + t.getKor());
+		}
 	}
 
 	@Override
@@ -109,14 +129,41 @@ public class WordMainFrame extends JFrame implements ActionListener {
 			String eng = j1.getText();
 			String kor = j2.getText();
 			System.out.println(eng + "/" + kor);
-			// 이벤트르발생한소스가 c1btn이라면, j1을가져와
+			// 이벤트르발생한소스가 c1btn이라면, j1, j2를 각 변수에 저장
 
-			// DTO에 저장하고 DAO를 통해서 db에 저장
+			// DTO에 저장하고 DAO를 통해서 DB에 저장
 			WordDTO wdto = new WordDTO();
 			wdto.setEng(eng);
 			wdto.setKor(kor);
 			dbdao.add(wdto);
-		} // 삭제, 수정 이어서 작업
+		} else if (e.getSource() == c5btn) {
+			String eng = j5.getText();
+			String kor = j6.getText();
+			WordDTO wdto = new WordDTO();
+			wdto.setEng(eng);
+			wdto.setKor(kor);
+			dbdao.mod(wdto);
+
+			// dao에게 넘겨서 수정합니다. 단, 영어단어는 수정 불가
+		} else if (e.getSource() == c22btn) {
+			String eng = j5.getText();
+			WordDTO wdto = new WordDTO();
+			wdto.setEng(eng);
+			// dao에게 넘겨서 삭제를 합니다.
+			dbdao.delect(wdto);
+		}
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		int selectNum = c22list.getSelectedIndex();
+		System.out.println(selectNum + "번이 선택 됨");
+
+		// 1. 리스트에서 가져오기, 2. DB에서 가져오기 중에 1로 진행
+		WordDTO tempdto = w.get(selectNum);
+		j5.setText(tempdto.getEng());
+		j6.setText(tempdto.getKor());
+
 	}
 
 }

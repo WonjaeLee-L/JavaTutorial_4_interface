@@ -4,7 +4,7 @@ package service;
 import dao_inf.DBdao;
 import dao_inf.WordDAO;
 
-public class WordService {
+public class del_WordService {
 	// DBdao worddao = null; // 객체를 알 필요 없고, 인터페이스의 참조변수만 알면 된다. 객체 만들어지지 않은 상태
 	// WordService 입장에서, 필요한 객체의 변수나 메서드 이름 등 다 알 필요가 없이,
 	// 인터페이스 이름인 DBdao와 내가 사용할 객체가 뭔지만 알면 된다. 의존도를 낮출 수 있다.
@@ -22,7 +22,7 @@ public class WordService {
 
 	// WordService가 그 객체를 몰라도 된다. 얘가 그 객체를 몰라도 된다.
 	// 누군가 주소를 알려주면 걔를 그냥 저장.
-	public WordService(DBdao db) {
+	public del_WordService(DBdao db) {
 		this.worddao = db;
 	}
 

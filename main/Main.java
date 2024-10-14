@@ -8,7 +8,6 @@ import service.WordMainFrame;
 public class Main {
 
 	public static void main(String[] args) {
-
 //		WordService ws = new WordService();
 
 		// oracle version
@@ -18,7 +17,6 @@ public class Main {
 
 		DBdao dao = new WordDAO();
 		WordMainFrame ws = new WordMainFrame(dao);
-
 	}
 
 }
